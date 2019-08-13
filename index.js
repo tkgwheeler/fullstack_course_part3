@@ -1,5 +1,8 @@
 const express = require("express");
 const app = express();
+const bodyParser = require("body-parser");
+
+app.use(bodyParser.json());
 
 let persons = [
   {
@@ -23,16 +26,16 @@ app.get("/", (request, response) => {
   response.send("<h1>Hello World</h1>");
 });
 
-app.get("/api/persons", (request, response) => {
-  response.json(persons);
-});
-
 app.get("/info", (request, response) => {
   let personsLength = persons.length;
   let date = new Date();
   response.send(
     `<p>Phonebook has info for ${personsLength} People</p><p>${date}</p>`
   );
+});
+
+app.get("/api/persons", (request, response) => {
+  response.json(persons);
 });
 
 app.get("/api/persons/:id", (request, response) => {
@@ -44,6 +47,41 @@ app.get("/api/persons/:id", (request, response) => {
   } else {
     response.status(404).end();
   }
+});
+
+app.delete("/api/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+  persons = persons.filter(person => person.id !== id);
+
+  response.status(204).end();
+});
+
+const generateId = () => {
+  const id = Math.floor(Math.random() * Math.floor(100000));
+  return id;
+};
+
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+  // - Error handle for missing Name/Number and whether Name is unique
+  if (!body.name || !body.number) {
+    return response.status(400).json({
+      error: "Missing name or number"
+    });
+  } else if (persons.findIndex(person => person.name === body.name) !== -1) {
+    return response.status(400).json({
+      error: "Name already exists"
+    });
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: generateId()
+  };
+
+  persons = persons.concat(person);
+  response.json(person);
 });
 
 const PORT = 3001;
