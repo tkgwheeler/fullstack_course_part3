@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-if (process.argv.length < 5) {
+if (process.argv.length < 3) {
   console.log("Give password, Contact name and Contact number");
   process.exit(1);
 }
@@ -20,20 +20,22 @@ const contactSchema = new mongoose.Schema({
 
 const Contact = mongoose.model("Contact", contactSchema);
 
-const contact = new Contact({
-  name: contactName,
-  number: contactNumber
-});
+if (process.argv.length === 3) {
+  Contact.find({}).then(result => {
+    result.forEach(contact => {
+      console.log(contact);
+      mongoose.connection.close();
+    });
+  });
+} else {
+  const contact = new Contact({
+    name: contactName,
+    number: contactNumber
+  });
 
-contact.save().then(response => {
-  console.log("Contact saved!");
-  console.log(response);
-  mongoose.connection.close();
-});
-
-// Note.find({}).then(result => {
-//   result.forEach(note => {
-//     console.log(note);
-//   });
-//   mongoose.connection.close();
-// });
+  contact.save().then(response => {
+    console.log("Contact saved!");
+    console.log(response);
+    mongoose.connection.close();
+  });
+}
