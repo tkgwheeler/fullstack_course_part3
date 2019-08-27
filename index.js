@@ -5,11 +5,9 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
 const Contact = require("./models/contact");
-
 app.use(express.static("build"));
 app.use(bodyParser.json());
 app.use(cors());
-
 app.use(morgan("tiny"));
 app.use(
   morgan(
@@ -25,24 +23,6 @@ app.use(
 morgan.token("data-sent", function(req, res) {
   return JSON.stringify(req.body);
 });
-
-let persons = [
-  {
-    name: "Billy Bob",
-    number: "1224-345-543",
-    id: 1
-  },
-  {
-    name: "Juliet Lewin",
-    number: "1224-123-456",
-    id: 2
-  },
-  {
-    name: "Frank the tank",
-    number: "1224-746-763",
-    id: 3
-  }
-];
 
 app.get("/", (request, response) => {
   response.send("<h1>Hello World</h1>");
@@ -135,7 +115,7 @@ app.put("/api/persons/:id", (request, response, next) => {
 const errorHandler = (error, request, response, next) => {
   console.error(error.message);
 
-  if (error.name === "CastError" && error.kind == "ObjectId") {
+  if (error.name === "CastError" && error.kind === "ObjectId") {
     return response.status(400).send({ error: "malformatted id" });
   } else if (error.name === "ValidationError") {
     return response.status(400).json({ error: error.message });
