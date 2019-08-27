@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
 mongoose.set("useFindAndModify", false);
 
@@ -16,8 +17,17 @@ mongoose
   });
 
 const contactSchema = new mongoose.Schema({
-  name: String,
-  number: String
+  name: {
+    type: String,
+    required: true,
+    minlength: 3,
+    unique: true
+  },
+  number: {
+    type: String,
+    required: true,
+    minlength: 8
+  }
 });
 
 contactSchema.set("toJSON", {
@@ -27,5 +37,7 @@ contactSchema.set("toJSON", {
     delete returnedObject.__v;
   }
 });
+
+contactSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model("Contact", contactSchema);
